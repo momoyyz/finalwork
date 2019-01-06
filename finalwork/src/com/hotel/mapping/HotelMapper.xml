@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="com.hotel.dao.HotelDao">
+  <!-- 查询酒店信息 -->
+  	<select id="getHotel" resultMap="result1" parameterType="Hotel">
+  		SELECT h_id,h_people,h_window,h_breakfas,h_toilet,h_other,h_number,h_img,h_price,h_type FROM `hotel`
+		<where>
+  			<if test="hotelId!=null and hotelId!=''">and h_id=#{hotelId}</if>
+  		</where>
+	
+	</select>
+  <!-- 新增预定信息 -->
+   <insert id="addReservation" parameterType="Reservation">
+		INSERT INTO reservation(
+			h_id,
+			r_start,
+			u_id,
+			r_end,
+			h_price,
+			h_type,
+			r_static,
+			r_phone,
+			r_name	
+		)
+		VALUES(
+			 #{hotelId},
+			 #{reservationStart},
+			 #{userId},
+			 #{reservationEnd},
+			 #{hotelPrice},
+			 #{hotelType},
+			 #{reservationStatic},
+			 #{reservationPhone},
+			 #{reservationName}
+		 )
+
+  	</insert>
+  	<!-- 被预定后，酒店数量减1 -->
+    <update id="updataHotelNum" parameterType="Hotel">
+  		UPDATE `hotel` SET h_number=#{hotelNumber} WHERE   h_id=#{hotelId}
+  	</update>
+  <!--用户查询预定信息  -->
+  	<select id="getReservation" parameterType="Reservation" resultMap="result2">
+  		SELECT 
+  			r_id,
+  			h_id,
+			r_name,
+			r_phone,
+			h_price,
+			h_type,
+			r_start,
+			r_end,
+			r_static,
+			r_uptime
+  		FROM `reservation`
+  		<where>
+  			<if test="userId!=null and userId!=''">and u_id=#{userId}</if>
+  			<if test="reservationId!=null and reservationId!=''">and r_id=#{reservationId}</if>
+  		</where>
+  		
+	</select>
+      <update id="cancelReservation" parameterType="Reservation">
+  		UPDATE `reservation` SET r_static=#{reservationStatic} WHERE   r_id=#{reservationId}
+  	</update>
+  
+  	<resultMap type="Hotel" id="result1">
+  		<result column="h_id" property="hotelId"/>
+		<result column="h_people" property="hotelPeople"/>
+		<result column="h_window" property="hotelWindow"/>
+		<result column="h_breakfas" property="hotelBreakfas"/>
+		<result column="h_toilet" property="hotelToilet"/>
+		<result column="h_other" property="hotelOther"/>
+		<result column="h_number" property="hotelNumber"/>
+		
+		<result column="h_price" property="hotelPrice"/>
+		<result column="h_img" property="hotelImg"/>
+		<result column="h_type" property="hotelType"/>
+  	</resultMap>
+  	
+  	
+   	   <resultMap type="Reservation" id="result2">
+   	     <id column="r_id" property="reservationId"/>
+   	     <result column="h_id" property="hotelId"/>
+  		 <result column="r_name" property="reservationName"/>
+		 <result column="r_phone" property="reservationPhone"/>
+		 <result column="h_price" property="hotelPrice"/>
+		 <result column="h_type" property="hotelType"/>
+		 <result column="r_start" property="reservationStart"/>
+		 <result column="r_end" property="reservationEnd"/>
+		 <result column="r_static" property="reservationStatic"/>
+		 <result column="r_uptime" property="reservationUpTime"/>
+  	  </resultMap>
+  </mapper>
